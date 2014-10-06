@@ -1,0 +1,2 @@
+#!/bin/sh
+./script/build && ./script/build-examples
