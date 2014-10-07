@@ -1,0 +1,1 @@
+require('./buildClassName.spec.js');
