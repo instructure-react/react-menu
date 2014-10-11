@@ -16,28 +16,49 @@ var App = React.createClass({
     alert('SECOND OPTION CLICKED');
   },
 
+  handleDisabledSelect: function() {
+    alert('this one is disabled');
+  },
+
   render: function() {
     return (
       <div>
 
-        <Menu>
+        <h1>react-menu</h1>
+        <p>
+          An accessible menu component built for React.JS
+        </p>
+
+        <Menu className='myMenu'>
           <MenuTrigger>
-            trigger
+            ⚙
           </MenuTrigger>
 
           <MenuOptions>
+
             <MenuOption>
-              an option
+              1st Option
             </MenuOption>
-            <div>
-              this is not an option
-            </div>
+
             <MenuOption onSelect={this.handleSecondOption}>
-              2nd option
+              2nd Option
             </MenuOption>
-            <MenuOption>
-              <a href='#'>3rd - link</a>
+
+            <div className='spacer'>
+            </div>
+
+            <MenuOption >
+              3rd Option
             </MenuOption>
+
+            <MenuOption >
+              4th Option
+            </MenuOption>
+
+            <MenuOption disabled={true} onDisabledSelect={this.handleDisabledSelect}>
+              diabled option
+            </MenuOption>
+
           </MenuOptions>
         </Menu>
       </div>

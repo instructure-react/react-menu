@@ -1,0 +1,22 @@
+body {
+  font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+  font-weight: 300;
+  background: #e6e6e6;
+  color: #4c4c4c;
+  font-size: 0.9em;
+}
+
+.Menu {
+  width: 200px;
+}
+
+.Menu__MenuTrigger {
+  text-align: right;
+  font-size: 1.8em;
+  padding-right: 10px;
+}
+
+.spacer {
+  height: 5px;
+  border-bottom: 1px solid #ccc;
+}
