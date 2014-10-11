@@ -2,6 +2,8 @@
 
 An accessible menu component built for React.JS
 
+See example at [http://knomedia.github.io/react-menu/](http://knomedia.github.io/react-menu/)
+
 ## Basic Usage
 
 ```html
