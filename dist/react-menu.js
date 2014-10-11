@@ -367,7 +367,8 @@ module.exports = function() {
     '.Menu__MenuOption': {
       padding: '5px',
       'border-radius': '2px',
-      outline: 'none'
+      outline: 'none',
+      cursor: 'pointer'
     },
     '.Menu__MenuOptions': {
       border: '1px solid #ccc',
@@ -393,9 +394,14 @@ module.exports = function() {
 };
 
 },{"js-stylesheet":8}],6:[function(_dereq_,module,exports){
-module.exports = _dereq_('./components/Menu');
+var Menu = _dereq_('./components/Menu');
+Menu.MenuTrigger = _dereq_('./components/MenuTrigger');
+Menu.MenuOptions = _dereq_('./components/MenuOptions');
+Menu.MenuOption = _dereq_('./components/MenuOption');
 
-},{"./components/Menu":1}],7:[function(_dereq_,module,exports){
+module.exports = Menu;
+
+},{"./components/Menu":1,"./components/MenuOption":2,"./components/MenuOptions":3,"./components/MenuTrigger":4}],7:[function(_dereq_,module,exports){
 module.exports = {
 
   buildClassName: function(baseName) {
