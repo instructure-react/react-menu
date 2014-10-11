@@ -2,7 +2,7 @@
   "name": "react-menu",
   "version": "0.0.2",
   "description": "Accessible menu component for React.JS",
-  "main": "./modules/index",
+  "main": "./lib/index",
   "repository": {
     "type": "git",
     "url": "https://github.com/knomedia/react-menu.git"
