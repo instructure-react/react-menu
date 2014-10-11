@@ -281,7 +281,7 @@ var MenuOptions = module.exports = React.createClass({displayName: 'exports',
   render: function() {
     return (
       React.DOM.div({
-        className: this.buildClassName('Menu_MenuOptions'), 
+        className: this.buildClassName('Menu__MenuOptions'), 
         onKeyUp: this.handleKeys
       }, 
         this.renderOptions()
@@ -355,16 +355,15 @@ var jss = _dereq_('js-stylesheet');
 
 module.exports = function() {
   jss({
-    '.Menu': {
-        'background-color': 'rgba(255, 255, 255, 0.75);'
-    },
     '.Menu__MenuOption': {
       padding: '5px',
-      'border-radius': '13px'
-    },
-    '.Menu__MenuOption': {
-      padding: '5px',
+      'border-radius': '2px',
       outline: 'none'
+    },
+    '.Menu__MenuOptions': {
+      border: '1px solid #ccc',
+      'border-radius': '3px',
+      background: '#FFF'
     },
     '.Menu__MenuOption--disabled': {
       'background-color': '#eee',
@@ -377,9 +376,9 @@ module.exports = function() {
     },
     '.Menu__MenuTrigger': {
       border: '1px solid #ccc',
-      background: '#fff',
       'border-radius': '3px',
       padding: '5px',
+      background: '#FFF'
     }
   });
 };
