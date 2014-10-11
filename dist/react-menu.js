@@ -120,11 +120,24 @@ var MenuOption = module.exports = React.createClass({displayName: 'exports',
   propTypes: {
     active: React.PropTypes.bool,
     onSelect: React.PropTypes.func,
+    onDisabledSelect: React.PropTypes.func,
+    disabled: React.PropTypes.bool
   },
 
   mixins: [buildClassName],
 
+  notifyDisabledSelect: function() {
+    if (this.props.onDisabledSelect) {
+      this.props.onDisabledSelect();
+    }
+  },
+
   onSelect: function() {
+    if (this.props.disabled) {
+      this.notifyDisabledSelect();
+      //early return if disabled
+      return;
+    }
     if (this.props.onSelect) {
       this.props.onSelect();
     }
@@ -153,8 +166,12 @@ var MenuOption = module.exports = React.createClass({displayName: 'exports',
 
   buildName: function() {
     var name = this.buildClassName('Menu__MenuOption');
-    if (this.props.active)
+    if (this.props.active){
       name += ' Menu__MenuOption--active';
+    }
+    if (this.props.disabled) {
+      name += ' Menu__MenuOption--disabled';
+    }
     return name;
   },
 
@@ -349,8 +366,14 @@ module.exports = function() {
       padding: '5px',
       outline: 'none'
     },
+    '.Menu__MenuOption--disabled': {
+      'background-color': '#eee',
+    },
     '.Menu__MenuOption--active': {
       'background-color': '#0aafff',
+    },
+    '.Menu__MenuOption--active.Menu__MenuOption--disabled': {
+      'background-color': '#ccc'
     },
     '.Menu__MenuTrigger': {
       border: '1px solid #ccc',
