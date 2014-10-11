@@ -1,61 +1,45 @@
 {
-  "name": "react-menu",
-  "version": "0.0.3",
-  "description": "Accessible menu component for React.JS",
-  "main": "./lib/index",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/knomedia/react-menu.git"
+  "name": "react-menu-example",
+  "version": "0.0.0",
+  "description": "example of using the react-menu component",
+  "main": "app-bundle.js",
+  "dependencies": {
+    "browserify": "^4.2.3",
+    "browserify-shim": "^3.6.0",
+    "envify": "^1.2.0",
+    "expect": "^0.1.1",
+    "fsmonitor": "^0.2.4",
+    "js-stylesheet": "^0.0.1",
+    "karma": "^0.12.16",
+    "karma-browserify": "^0.2.1",
+    "karma-chrome-launcher": "^0.1.4",
+    "karma-cli": "^0.0.4",
+    "karma-firefox-launcher": "^0.1.3",
+    "karma-mocha": "^0.1.3",
+    "react": "^0.11.2",
+    "react-menu": "0.0.3",
+    "react-tap-event-plugin": "^0.1.0",
+    "reactify": "^0.14.0",
+    "rf-release": "^0.3.1",
+    "uglify-js": "^2.4.15",
+    "webpack": "^1.4.5"
   },
-  "homepage": "https://github.com/knomedia/react-menu",
-  "bugs": "https://github.com/knomedia/react-menu/issues",
-  "directories": {
-    "example": "examples"
+  "devDependencies": {
+    "mocha": "^1.20.1",
+    "jsx-loader": "^0.11.0",
+    "webpack": "^1.3.0-beta5"
   },
   "scripts": {
-    "test": "script/test --browsers Firefox --single-run"
+    "test": "mocha"
   },
-  "authors": [
-    "Jason Madsen"
-  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/knomedia/react-menu.git"
+  },
+  "author": "",
   "license": "MIT",
-  "devDependencies": {
-    "browserify": "4.2.3",
-    "browserify-shim": "3.6.0",
-    "envify": "1.2.0",
-    "expect": "0.1.1",
-    "karma": "0.12.16",
-    "karma-browserify": "^0.2.1",
-    "karma-chrome-launcher": "0.1.4",
-    "karma-cli": "0.0.4",
-    "karma-firefox-launcher": "0.1.3",
-    "karma-mocha": "0.1.3",
-    "mocha": "1.20.1",
-    "react": ">=0.11.0",
-    "react-tap-event-plugin": "git://github.com/appsforartists/react-tap-event-plugin",
-    "reactify": "^0.14.0",
-    "rf-release": "0.3.1",
-    "uglify-js": "2.4.15",
-    "fsmonitor": "^0.2.4"
+  "bugs": {
+    "url": "https://github.com/knomedia/react-menu/issues"
   },
-  "peerDependencies": {
-    "react": ">=0.11.0"
-  },
-  "tags": [
-    "react",
-    "menu",
-    "dropdown"
-  ],
-  "keywords": [
-    "react",
-    "react-component",
-    "menu",
-    "dropdown"
-  ],
-  "browserify-shim": {
-    "react": "global:React"
-  },
-  "dependencies": {
-    "js-stylesheet": "0.0.1"
-  }
+  "homepage": "https://github.com/knomedia/react-menu"
 }

@@ -1,14 +1,12 @@
 /** @jsx React.DOM */
 
 var React = require('react');
-var Menu = require('../../lib/index');
-var MenuTrigger = require('../../lib/components/MenuTrigger');
-var MenuOptions = require('../../lib/components/MenuOptions');
-var MenuOption = require('../../lib/components/MenuOption');
-
+var Menu = require('react-menu');
+var MenuTrigger = Menu.MenuTrigger;
+var MenuOptions = Menu.MenuOptions;
+var MenuOption = Menu.MenuOption;
 
 Menu.injectCSS();
-
 
 var App = React.createClass({
 
@@ -22,11 +20,11 @@ var App = React.createClass({
 
   render: function() {
     return (
-      <div>
+      <div className='example'>
 
         <h1>react-menu</h1>
         <p>
-          An accessible menu component built for React.JS
+          Accessible react menu component
         </p>
 
         <Menu className='myMenu'>
@@ -66,6 +64,5 @@ var App = React.createClass({
   }
 
 });
-
 
 React.renderComponent(<App/>, document.body);

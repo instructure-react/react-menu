@@ -6,6 +6,11 @@ body {
   font-size: 0.9em;
 }
 
+.example {
+  width: 300px;
+  margin: 0 auto;
+}
+
 .Menu {
   width: 200px;
 }
