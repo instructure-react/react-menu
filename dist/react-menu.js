@@ -35,6 +35,15 @@ var Menu = module.exports = React.createClass({
     this.refs.trigger.getDOMNode().focus();
   },
 
+  handleBlur: function(e) {
+    // give next element a tick to take focus
+    setTimeout(function() {
+      console.log(document.activeElement.className);
+      if (!document.activeElement.className.match(/Menu__/)){
+        this.closeMenu();
+      }
+    }.bind(this), 1);
+  },
 
   handleTriggerToggle: function() {
     this.setState({active: !this.state.active}, this.attemptOptionsFocus);
@@ -99,7 +108,8 @@ var Menu = module.exports = React.createClass({
       React.DOM.div({
         className: this.buildClassName('Menu'), 
         role: "menu", 
-        onKeyDown: this.handleKeys
+        onKeyDown: this.handleKeys, 
+        onBlur: this.handleBlur
       }, 
         this.renderTrigger(), 
         this.renderMenuOptions()
