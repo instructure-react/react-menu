@@ -1,3 +1,12 @@
+v0.0.4 - Wed, 15 Oct 2014 17:53:32 GMT
+--------------------------------------
+
+- [022b8a8](../../commit/022b8a8) [fixed] issue where menu items not positioned absolute
+- [94b0dcf](../../commit/94b0dcf) [fixed] issue where menu always steals focus
+- [3fd228c](../../commit/3fd228c) [added] MenuOption cursor pointer in default style
+- [80cc592](../../commit/80cc592) [added] link to gh-pages example
+
+
 v0.0.3 - Sat, 11 Oct 2014 20:51:58 GMT
 --------------------------------------
 
