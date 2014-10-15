@@ -61,6 +61,9 @@ var App = React.createClass({
 
           </MenuOptions>
         </Menu>
+
+        <p>react-menu has keyboard and screen reader support.</p>
+        <button>focusable</button>
       </div>
     )
   }
