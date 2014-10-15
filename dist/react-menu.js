@@ -38,7 +38,7 @@ var Menu = module.exports = React.createClass({
   handleBlur: function(e) {
     // give next element a tick to take focus
     setTimeout(function() {
-      if (!document.activeElement.className.match(/Menu__/)){
+      if (!document.activeElement.className.match(/Menu__/) && this.state.active){
         this.closeMenu();
       }
     }.bind(this), 1);
@@ -364,16 +364,20 @@ var jss = _dereq_('js-stylesheet');
 
 module.exports = function() {
   jss({
+    '.Menu': {
+      position: 'relative'
+    },
+    '.Menu__MenuOptions': {
+      border: '1px solid #ccc',
+      'border-radius': '3px',
+      background: '#FFF',
+      position: 'absolute'
+    },
     '.Menu__MenuOption': {
       padding: '5px',
       'border-radius': '2px',
       outline: 'none',
       cursor: 'pointer'
-    },
-    '.Menu__MenuOptions': {
-      border: '1px solid #ccc',
-      'border-radius': '3px',
-      background: '#FFF'
     },
     '.Menu__MenuOption--disabled': {
       'background-color': '#eee',
