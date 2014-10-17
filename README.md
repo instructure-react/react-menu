@@ -74,10 +74,10 @@ The following class names are used / available for modification in your own styl
 .Menu__MenuTrigger
 .Menu__MenuOptions
 .Menu__MenuOption
-.Menu__MenuOptions--vertical--bottom
-.Menu__MenuOptions--vertical--top
-.Menu__MenuOptions--horizontal--right
-.Menu__MenuOptions--horizontal--left
+.Menu__MenuOptions--vertical-bottom
+.Menu__MenuOptions--vertical-top
+.Menu__MenuOptions--horizontal-right
+.Menu__MenuOptions--horizontal-left
 ```
 
 The last four class names control the placement of menu options when the menu
