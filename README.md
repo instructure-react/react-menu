@@ -64,7 +64,8 @@ var Menu = require('react-menu');
 Menu.injectCSS();
 ```
 
-Default styles will be added to the top of the head, and thus any styles you write will override any of the defaults.
+Default styles will be added to the top of the head, and thus any styles you
+write will override any of the defaults.
 
 The following class names are used / available for modification in your own stylsheets:
 
@@ -73,4 +74,13 @@ The following class names are used / available for modification in your own styl
 .Menu__MenuTrigger
 .Menu__MenuOptions
 .Menu__MenuOption
+.Menu__MenuOptions--vertical--bottom
+.Menu__MenuOptions--vertical--top
+.Menu__MenuOptions--horizontal--right
+.Menu__MenuOptions--horizontal--left
 ```
+
+The last four class names control the placement of menu options when the menu
+would otherwise bleed off the screen. See `/lib/helpers/injectCSS.js` for
+defaults. The `.Menu__MenuOptions` element will always have a vertical and
+horizontal modifier.

@@ -23,7 +23,9 @@ var Menu = module.exports = React.createClass({
   getInitialState: function(){
     return {
       active: false,
-      selectedIndex: 0
+      selectedIndex: 0,
+      horizontalPlacement: 'right', // only 'right' || 'left'
+      verticalPlacement: 'bottom' // only 'top' || 'bottom'
     };
   },
 
@@ -45,15 +47,33 @@ var Menu = module.exports = React.createClass({
   },
 
   handleTriggerToggle: function() {
-    this.setState({active: !this.state.active}, this.attemptOptionsFocus);
+    this.setState({active: !this.state.active}, this.afterTriggerToggle);
   },
 
-  attemptOptionsFocus: function() {
-    if (this.state.active){
+  afterTriggerToggle: function() {
+    if (this.state.active) {
       this.refs.options.focusOption(0);
+      this.updatePositioning();
     }
   },
 
+  updatePositioning: function() {
+    var triggerRect = this.refs.trigger.getDOMNode().getBoundingClientRect();
+    var optionsRect = this.refs.options.getDOMNode().getBoundingClientRect();
+    positionState = {};
+    // horizontal = left if it wont fit on left side
+    if (triggerRect.left + optionsRect.width > window.innerWidth) {
+      positionState.horizontalPlacement = 'left';
+    } else {
+      positionState.horizontalPlacement = 'right';
+    }
+    if (triggerRect.top + optionsRect.height > window.innerHeight) {
+      positionState.verticalPlacement = 'top';
+    } else {
+      positionState.verticalPlacement = 'bottom';
+    }
+    this.setState(positionState);
+  },
 
   handleKeys: function(e) {
     if (e.key === 'Escape') {
@@ -93,6 +113,8 @@ var Menu = module.exports = React.createClass({
         if (child.type === MenuOptions.type) {
           options = cloneWithProps(child, {
             ref: 'options',
+            horizontalPlacement: this.state.horizontalPlacement,
+            verticalPlacement: this.state.verticalPlacement,
             onSelectionMade: this.closeMenu
           });
         }
@@ -287,10 +309,17 @@ var MenuOptions = module.exports = React.createClass({displayName: 'exports',
     }.bind(this));
   },
 
+  buildName: function() {
+    var cn = this.buildClassName('Menu__MenuOptions');
+    cn += ' Menu__MenuOptions--horizontal-' + this.props.horizontalPlacement;
+    cn += ' Menu__MenuOptions--vertical-' + this.props.verticalPlacement;
+    return cn;
+  },
+
   render: function() {
     return (
       React.DOM.div({
-        className: this.buildClassName('Menu__MenuOptions'), 
+        className: this.buildName(), 
         onKeyUp: this.handleKeys
       }, 
         this.renderOptions()
@@ -393,6 +422,17 @@ module.exports = function() {
       'border-radius': '3px',
       padding: '5px',
       background: '#FFF'
+    },
+    '.Menu__MenuOptions--horizontal-left': {
+      right: '0px'
+    },
+    '.Menu__MenuOptions--horizontal-right': {
+      left: '0px'
+    },
+    '.Menu__MenuOptions--vertical-top': {
+      bottom: '45px'
+    },
+    '.Menu__MenuOptions--vertical-bottom': {
     }
   });
 };
