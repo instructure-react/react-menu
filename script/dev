@@ -1,6 +1,0 @@
-#!/bin/sh
-./node_modules/.bin/fsmonitor -p -s '!*bundle.js' '!*.swp' -d examples/ script/build-all &
-./node_modules/.bin/fsmonitor -p -s '!*.swp' -d lib/ script/build-all
-
-kill %1
-kill %2
