@@ -56,7 +56,7 @@ var App = React.createClass({
             </MenuOption>
 
             <MenuOption disabled={true} onDisabledSelect={this.handleDisabledSelect}>
-              diabled option
+              disabled option
             </MenuOption>
 
           </MenuOptions>

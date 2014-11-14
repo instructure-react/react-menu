@@ -14,7 +14,7 @@
   },
   "scripts": {
     "test": "script/test --browsers Firefox --single-run",
-    "start": "scripts/dev-examples"
+    "start": "script/dev-examples"
   },
   "authors": [
     "Jason Madsen"
