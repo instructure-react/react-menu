@@ -1,3 +1,11 @@
+v0.0.5 - Sat, 29 Nov 2014 18:42:49 GMT
+--------------------------------------
+
+- [d61cbcf](../../commit/d61cbcf) [fixed] typo in docs regarding css class names
+- [7e5fa2a](../../commit/7e5fa2a) [fixed] Accessibility issues closes #2
+- [7e91a17](../../commit/7e91a17) [added] smart css defaults for MenuOptions placement
+
+
 v0.0.4 - Wed, 15 Oct 2014 17:53:32 GMT
 --------------------------------------
 
