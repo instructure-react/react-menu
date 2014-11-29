@@ -14,7 +14,7 @@ throws = assert.throws;
 
 var _menuNode;
 renderMenu = function() {
-  return React.render((
+  return React.renderComponent((
     <Menu>
       <MenuTrigger>I am the trigger, goo goo goo joob</MenuTrigger>
       <MenuOptions>
