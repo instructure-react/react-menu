@@ -7,6 +7,7 @@ var cloneWithProps = _dereq_('react/lib/cloneWithProps');
 var MenuTrigger = _dereq_('./MenuTrigger');
 var MenuOptions = _dereq_('./MenuOptions');
 var MenuOption = _dereq_('./MenuOption');
+var uuid = _dereq_('../helpers/uuid');
 var injectCSS = _dereq_('../helpers/injectCSS');
 var buildClassName = _dereq_('../mixins/buildClassName');
 
@@ -20,8 +21,21 @@ var Menu = module.exports = React.createClass({
 
   mixins: [buildClassName],
 
+  childContextTypes: {
+    id: React.PropTypes.string,
+    active: React.PropTypes.bool
+  },
+
+  getChildContext: function () {
+    return {
+      id: this.state.id,
+      active: this.state.active
+    };
+  },
+
   getInitialState: function(){
     return {
+      id: uuid(),
       active: false,
       selectedIndex: 0,
       horizontalPlacement: 'right', // only 'right' || 'left'
@@ -94,8 +108,8 @@ var Menu = module.exports = React.createClass({
       React.Children.forEach(this.props.children, function(child){
         if (child.type === MenuTrigger.type) {
           trigger = cloneWithProps(child, {
-            onToggleActive: this.handleTriggerToggle,
-            ref: 'trigger'
+            ref: 'trigger',
+            onToggleActive: this.handleTriggerToggle
           });
         }
       }.bind(this));
@@ -104,9 +118,6 @@ var Menu = module.exports = React.createClass({
   },
 
   renderMenuOptions: function() {
-    if (!this.state.active) {
-      return null;
-    }
     var options;
     if(this.verifyTwoChildren()) {
       React.Children.forEach(this.props.children, function(child){
@@ -128,7 +139,6 @@ var Menu = module.exports = React.createClass({
     return (
       React.DOM.div({
         className: this.buildClassName('Menu'), 
-        role: "menu", 
         onKeyDown: this.handleKeys, 
         onBlur: this.handleBlur
       }, 
@@ -140,7 +150,7 @@ var Menu = module.exports = React.createClass({
 
 });
 
-},{"../helpers/injectCSS":5,"../mixins/buildClassName":7,"./MenuOption":2,"./MenuOptions":3,"./MenuTrigger":4,"react/lib/cloneWithProps":10}],2:[function(_dereq_,module,exports){
+},{"../helpers/injectCSS":5,"../helpers/uuid":6,"../mixins/buildClassName":8,"./MenuOption":2,"./MenuOptions":3,"./MenuTrigger":4,"react/lib/cloneWithProps":11}],2:[function(_dereq_,module,exports){
 /** @jsx React.DOM */
 
 var React = (typeof window !== "undefined" ? window.React : typeof global !== "undefined" ? global.React : null);
@@ -215,7 +225,8 @@ var MenuOption = module.exports = React.createClass({displayName: 'exports',
         onMouseOver: this.handleHover, 
         className: this.buildName(), 
         role: "menuitem", 
-        tabIndex: "-1"
+        tabIndex: "-1", 
+        'aria-disabled': this.props.disabled
       }, 
         this.props.children
       )
@@ -224,7 +235,7 @@ var MenuOption = module.exports = React.createClass({displayName: 'exports',
 
 });
 
-},{"../mixins/buildClassName":7}],3:[function(_dereq_,module,exports){
+},{"../mixins/buildClassName":8}],3:[function(_dereq_,module,exports){
 /** @jsx React.DOM */
 
 var React = (typeof window !== "undefined" ? window.React : typeof global !== "undefined" ? global.React : null);
@@ -233,6 +244,11 @@ var cloneWithProps = _dereq_('react/lib/cloneWithProps')
 var buildClassName = _dereq_('../mixins/buildClassName');
 
 var MenuOptions = module.exports = React.createClass({displayName: 'exports',
+
+  contextTypes: {
+    id: React.PropTypes.string,
+    active: React.PropTypes.bool
+  },
 
   getInitialState: function() {
     return {activeIndex: 0}
@@ -279,16 +295,11 @@ var MenuOptions = module.exports = React.createClass({displayName: 'exports',
   },
 
   updateFocusIndexBy: function(delta) {
-    // open menu if it's closed, and retry focus
-    if (!this.state.active) {
-      this.selectedIndex = 0;
-      this.setState({active: true}, this.updateFocusIndexBy.bind(this, 0));
-      return
-    }
     var optionNodes = this.getDOMNode().querySelectorAll('.Menu__MenuOption');
     this.normalizeSelectedBy(delta, optionNodes.length);
-    this.setState({activeIndex: this.selectedIndex});
-    optionNodes[this.selectedIndex].focus();
+    this.setState({activeIndex: this.selectedIndex}, function () {
+      optionNodes[this.selectedIndex].focus();
+    });
   },
 
   renderOptions: function() {
@@ -319,8 +330,13 @@ var MenuOptions = module.exports = React.createClass({displayName: 'exports',
   render: function() {
     return (
       React.DOM.div({
+        id: this.context.id, 
+        role: "menu", 
+        tabIndex: "-1", 
+        'aria-expanded': this.context.active, 
+        style: {visibility: this.context.active ? 'visible' : 'hidden'}, 
         className: this.buildName(), 
-        onKeyUp: this.handleKeys
+        onKeyDown: this.handleKeys
       }, 
         this.renderOptions()
       )
@@ -329,7 +345,7 @@ var MenuOptions = module.exports = React.createClass({displayName: 'exports',
 
 });
 
-},{"../mixins/buildClassName":7,"./MenuOption":2,"react/lib/cloneWithProps":10}],4:[function(_dereq_,module,exports){
+},{"../mixins/buildClassName":8,"./MenuOption":2,"react/lib/cloneWithProps":11}],4:[function(_dereq_,module,exports){
 /** @jsx React.DOM */
 
 var React = (typeof window !== "undefined" ? window.React : typeof global !== "undefined" ? global.React : null);
@@ -337,23 +353,15 @@ var buildClassName = _dereq_('../mixins/buildClassName');
 
 var MenuTrigger = module.exports = React.createClass({displayName: 'exports',
 
-  getInitialState: function() {
-    return {
-      active: false
-    };
+  contextTypes: {
+    id: React.PropTypes.string,
+    active: React.PropTypes.bool
   },
 
   mixins: [buildClassName],
 
-  notifyParent: function() {
-    if (this.props.onToggleActive)
-      this.props.onToggleActive(this.state.active);
-  },
-
   toggleActive: function() {
-    this.setState({
-      active: !this.state.active
-    }, this.notifyParent);
+    this.props.onToggleActive(!this.context.active);
   },
 
   handleKeyUp: function(e) {
@@ -379,7 +387,10 @@ var MenuTrigger = module.exports = React.createClass({displayName: 'exports',
         onClick: this.handleClick, 
         onKeyUp: this.handleKeyUp, 
         onKeyDown: this.handleKeyDown, 
-        tabIndex: "0"
+        tabIndex: "0", 
+        role: "button", 
+        'aria-owns': this.context.id, 
+        'aria-haspopup': "true"
       }, 
         this.props.children
       )
@@ -388,7 +399,7 @@ var MenuTrigger = module.exports = React.createClass({displayName: 'exports',
 
 });
 
-},{"../mixins/buildClassName":7}],5:[function(_dereq_,module,exports){
+},{"../mixins/buildClassName":8}],5:[function(_dereq_,module,exports){
 var jss = _dereq_('js-stylesheet');
 
 module.exports = function() {
@@ -437,7 +448,13 @@ module.exports = function() {
   });
 };
 
-},{"js-stylesheet":8}],6:[function(_dereq_,module,exports){
+},{"js-stylesheet":9}],6:[function(_dereq_,module,exports){
+var count = 0;
+module.exports = function () {
+  return 'react-menu-' + count++;
+};
+
+},{}],7:[function(_dereq_,module,exports){
 var Menu = _dereq_('./components/Menu');
 Menu.MenuTrigger = _dereq_('./components/MenuTrigger');
 Menu.MenuOptions = _dereq_('./components/MenuOptions');
@@ -445,7 +462,7 @@ Menu.MenuOption = _dereq_('./components/MenuOption');
 
 module.exports = Menu;
 
-},{"./components/Menu":1,"./components/MenuOption":2,"./components/MenuOptions":3,"./components/MenuTrigger":4}],7:[function(_dereq_,module,exports){
+},{"./components/Menu":1,"./components/MenuOption":2,"./components/MenuOptions":3,"./components/MenuTrigger":4}],8:[function(_dereq_,module,exports){
 module.exports = {
 
   buildClassName: function(baseName) {
@@ -457,7 +474,7 @@ module.exports = {
   },
 };
 
-},{}],8:[function(_dereq_,module,exports){
+},{}],9:[function(_dereq_,module,exports){
 !(function() {
   function jss(blocks) {
     var css = [];
@@ -497,7 +514,7 @@ module.exports = {
 })();
 
 
-},{}],9:[function(_dereq_,module,exports){
+},{}],10:[function(_dereq_,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -661,7 +678,7 @@ var ReactPropTransferer = {
 
 module.exports = ReactPropTransferer;
 
-},{"./emptyFunction":12,"./invariant":13,"./joinClasses":14,"./merge":17}],10:[function(_dereq_,module,exports){
+},{"./emptyFunction":13,"./invariant":14,"./joinClasses":15,"./merge":18}],11:[function(_dereq_,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -724,7 +741,7 @@ function cloneWithProps(child, props) {
 
 module.exports = cloneWithProps;
 
-},{"./ReactPropTransferer":9,"./keyOf":16,"./warning":20}],11:[function(_dereq_,module,exports){
+},{"./ReactPropTransferer":10,"./keyOf":17,"./warning":21}],12:[function(_dereq_,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -780,7 +797,7 @@ function copyProperties(obj, a, b, c, d, e, f) {
 
 module.exports = copyProperties;
 
-},{}],12:[function(_dereq_,module,exports){
+},{}],13:[function(_dereq_,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -825,7 +842,7 @@ copyProperties(emptyFunction, {
 
 module.exports = emptyFunction;
 
-},{"./copyProperties":11}],13:[function(_dereq_,module,exports){
+},{"./copyProperties":12}],14:[function(_dereq_,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -887,7 +904,7 @@ var invariant = function(condition, format, a, b, c, d, e, f) {
 
 module.exports = invariant;
 
-},{}],14:[function(_dereq_,module,exports){
+},{}],15:[function(_dereq_,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -933,7 +950,7 @@ function joinClasses(className/*, ... */) {
 
 module.exports = joinClasses;
 
-},{}],15:[function(_dereq_,module,exports){
+},{}],16:[function(_dereq_,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -993,7 +1010,7 @@ var keyMirror = function(obj) {
 
 module.exports = keyMirror;
 
-},{"./invariant":13}],16:[function(_dereq_,module,exports){
+},{"./invariant":14}],17:[function(_dereq_,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -1036,7 +1053,7 @@ var keyOf = function(oneKeyObj) {
 
 module.exports = keyOf;
 
-},{}],17:[function(_dereq_,module,exports){
+},{}],18:[function(_dereq_,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -1075,7 +1092,7 @@ var merge = function(one, two) {
 
 module.exports = merge;
 
-},{"./mergeInto":19}],18:[function(_dereq_,module,exports){
+},{"./mergeInto":20}],19:[function(_dereq_,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -1224,7 +1241,7 @@ var mergeHelpers = {
 
 module.exports = mergeHelpers;
 
-},{"./invariant":13,"./keyMirror":15}],19:[function(_dereq_,module,exports){
+},{"./invariant":14,"./keyMirror":16}],20:[function(_dereq_,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -1272,7 +1289,7 @@ function mergeInto(one, two) {
 
 module.exports = mergeInto;
 
-},{"./mergeHelpers":18}],20:[function(_dereq_,module,exports){
+},{"./mergeHelpers":19}],21:[function(_dereq_,module,exports){
 /**
  * Copyright 2014 Facebook, Inc.
  *
@@ -1322,6 +1339,6 @@ if ("production" !== "production") {
 
 module.exports = warning;
 
-},{"./emptyFunction":12}]},{},[6])
-(6)
+},{"./emptyFunction":13}]},{},[7])
+(7)
 });
