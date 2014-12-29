@@ -23,12 +23,6 @@ var App = React.createClass({
   render: function() {
     return (
       <div>
-
-        <h1>react-menu</h1>
-        <p>
-          An accessible menu component built for React.JS
-        </p>
-
         <Menu className='myMenu'>
           <MenuTrigger>
             ⚙
@@ -71,4 +65,4 @@ var App = React.createClass({
 });
 
 
-React.renderComponent(<App/>, document.body);
+React.renderComponent(<App/>, document.getElementById('example'));

@@ -1,9 +1,21 @@
 body {
-  font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
-  font-weight: 300;
-  background: #e6e6e6;
-  color: #4c4c4c;
-  font-size: 0.9em;
+  font-family: "Helvetica Neue", sans-serif;
+  font-weight: 200;
+  margin: 0;
+  color: #333;
+}
+
+.branding {
+  border-bottom: 1px solid hsl(200, 0%, 90%);
+}
+
+.branding h1,
+.branding h2 {
+  font-weight: 200;
+}
+
+.padbox {
+  padding: 40px;
 }
 
 .Menu {
