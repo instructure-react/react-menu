@@ -13,7 +13,8 @@ strictEqual = assert.strictEqual;
 throws = assert.throws;
 
 var _menuNode;
-renderMenu = function() {
+renderMenu = function(container) {
+  container = container || document.body;
   return React.renderComponent((
     <Menu>
       <MenuTrigger>I am the trigger, goo goo goo joob</MenuTrigger>
@@ -24,9 +25,11 @@ renderMenu = function() {
         <MenuOption disabled={true}>Disabled</MenuOption>
       </MenuOptions>
     </Menu>
-  ), document.body);
+  ), container);
 };
 
-unmountMenu = function() {
-  React.unmountComponentAtNode(document.body);
+unmountMenu = function(container) {
+  container = container || document.body;
+  React.unmountComponentAtNode(container);
 };
+
