@@ -56,6 +56,11 @@
   "browserify-shim": {
     "react": "global:React"
   },
+  "browserify": {
+    "transform": [
+      "reactify"
+    ]
+  },
   "dependencies": {
     "js-stylesheet": "0.0.1"
   }
