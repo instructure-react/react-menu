@@ -54,7 +54,7 @@ var Menu = module.exports = React.createClass({
   handleBlur: function(e) {
     // give next element a tick to take focus
     setTimeout(function() {
-      if (!document.activeElement.className.match(/Menu__/) && this.state.active){
+      if (!this.getDOMNode().contains(document.activeElement) && this.state.active){
         this.closeMenu();
       }
     }.bind(this), 1);
@@ -74,7 +74,7 @@ var Menu = module.exports = React.createClass({
   updatePositioning: function() {
     var triggerRect = this.refs.trigger.getDOMNode().getBoundingClientRect();
     var optionsRect = this.refs.options.getDOMNode().getBoundingClientRect();
-    positionState = {};
+    var positionState = {};
     // horizontal = left if it wont fit on left side
     if (triggerRect.left + optionsRect.width > window.innerWidth) {
       positionState.horizontalPlacement = 'left';
@@ -150,7 +150,7 @@ var Menu = module.exports = React.createClass({
 
 });
 
-},{"../helpers/injectCSS":5,"../helpers/uuid":6,"../mixins/buildClassName":8,"./MenuOption":2,"./MenuOptions":3,"./MenuTrigger":4,"react/lib/cloneWithProps":11}],2:[function(_dereq_,module,exports){
+},{"../helpers/injectCSS":5,"../helpers/uuid":6,"../mixins/buildClassName":8,"./MenuOption":2,"./MenuOptions":3,"./MenuTrigger":4,"react/lib/cloneWithProps":15}],2:[function(_dereq_,module,exports){
 /** @jsx React.DOM */
 
 var React = (typeof window !== "undefined" ? window.React : typeof global !== "undefined" ? global.React : null);
@@ -345,7 +345,7 @@ var MenuOptions = module.exports = React.createClass({displayName: 'exports',
 
 });
 
-},{"../mixins/buildClassName":8,"./MenuOption":2,"react/lib/cloneWithProps":11}],4:[function(_dereq_,module,exports){
+},{"../mixins/buildClassName":8,"./MenuOption":2,"react/lib/cloneWithProps":15}],4:[function(_dereq_,module,exports){
 /** @jsx React.DOM */
 
 var React = (typeof window !== "undefined" ? window.React : typeof global !== "undefined" ? global.React : null);
@@ -367,13 +367,11 @@ var MenuTrigger = module.exports = React.createClass({displayName: 'exports',
   handleKeyUp: function(e) {
     if (e.key === ' ')
       this.toggleActive();
-    return true;
   },
 
   handleKeyDown: function(e) {
     if (e.key === 'Enter')
       this.toggleActive();
-    return true;
   },
 
   handleClick: function() {
@@ -381,9 +379,17 @@ var MenuTrigger = module.exports = React.createClass({displayName: 'exports',
   },
 
   render: function() {
+    var triggerClassName =
+      this.buildClassName(
+        'Menu__MenuTrigger ' +
+        (this.context.active
+        ? 'Menu__MenuTrigger__active'
+        : 'Menu__MenuTrigger__inactive')
+      );
+
     return (
       React.DOM.div({
-        className: this.buildClassName('Menu__MenuTrigger'), 
+        className: triggerClassName, 
         onClick: this.handleClick, 
         onKeyUp: this.handleKeyUp, 
         onKeyDown: this.handleKeyDown, 
@@ -516,29 +522,412 @@ module.exports = {
 
 },{}],10:[function(_dereq_,module,exports){
 /**
- * Copyright 2013-2014 Facebook, Inc.
+ * Copyright 2014, Facebook, Inc.
+ * All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ * @providesModule Object.assign
+ */
+
+// https://people.mozilla.org/~jorendorff/es6-draft.html#sec-object.assign
+
+function assign(target, sources) {
+  if (target == null) {
+    throw new TypeError('Object.assign target cannot be null or undefined');
+  }
+
+  var to = Object(target);
+  var hasOwnProperty = Object.prototype.hasOwnProperty;
+
+  for (var nextIndex = 1; nextIndex < arguments.length; nextIndex++) {
+    var nextSource = arguments[nextIndex];
+    if (nextSource == null) {
+      continue;
+    }
+
+    var from = Object(nextSource);
+
+    // We don't currently support accessors nor proxies. Therefore this
+    // copy cannot throw. If we ever supported this then we must handle
+    // exceptions and side-effects. We don't support symbols so they won't
+    // be transferred.
+
+    for (var key in from) {
+      if (hasOwnProperty.call(from, key)) {
+        to[key] = from[key];
+      }
+    }
+  }
+
+  return to;
+};
+
+module.exports = assign;
+
+},{}],11:[function(_dereq_,module,exports){
+/**
+ * Copyright 2013-2014, Facebook, Inc.
+ * All rights reserved.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
+ *
+ * @providesModule ReactContext
+ */
+
+"use strict";
+
+var assign = _dereq_("./Object.assign");
+
+/**
+ * Keeps track of the current context.
+ *
+ * The context is automatically passed down the component ownership hierarchy
+ * and is accessible via `this.context` on ReactCompositeComponents.
+ */
+var ReactContext = {
+
+  /**
+   * @internal
+   * @type {object}
+   */
+  current: {},
+
+  /**
+   * Temporarily extends the current context while executing scopedCallback.
+   *
+   * A typical use case might look like
+   *
+   *  render: function() {
+   *    var children = ReactContext.withContext({foo: 'foo'}, () => (
+   *
+   *    ));
+   *    return <div>{children}</div>;
+   *  }
+   *
+   * @param {object} newContext New context to merge into the existing context
+   * @param {function} scopedCallback Callback to run with the new context
+   * @return {ReactComponent|array<ReactComponent>}
+   */
+  withContext: function(newContext, scopedCallback) {
+    var result;
+    var previousContext = ReactContext.current;
+    ReactContext.current = assign({}, previousContext, newContext);
+    try {
+      result = scopedCallback();
+    } finally {
+      ReactContext.current = previousContext;
+    }
+    return result;
+  }
+
+};
+
+module.exports = ReactContext;
+
+},{"./Object.assign":10}],12:[function(_dereq_,module,exports){
+/**
+ * Copyright 2013-2014, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
+ *
+ * @providesModule ReactCurrentOwner
+ */
+
+"use strict";
+
+/**
+ * Keeps track of the current owner.
+ *
+ * The current owner is the component who should own any components that are
+ * currently being constructed.
+ *
+ * The depth indicate how many composite components are above this render level.
+ */
+var ReactCurrentOwner = {
+
+  /**
+   * @internal
+   * @type {ReactComponent}
+   */
+  current: null
+
+};
+
+module.exports = ReactCurrentOwner;
+
+},{}],13:[function(_dereq_,module,exports){
+/**
+ * Copyright 2014, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
+ *
+ * @providesModule ReactElement
+ */
+
+"use strict";
+
+var ReactContext = _dereq_("./ReactContext");
+var ReactCurrentOwner = _dereq_("./ReactCurrentOwner");
+
+var warning = _dereq_("./warning");
+
+var RESERVED_PROPS = {
+  key: true,
+  ref: true
+};
+
+/**
+ * Warn for mutations.
+ *
+ * @internal
+ * @param {object} object
+ * @param {string} key
+ */
+function defineWarningProperty(object, key) {
+  Object.defineProperty(object, key, {
+
+    configurable: false,
+    enumerable: true,
+
+    get: function() {
+      if (!this._store) {
+        return null;
+      }
+      return this._store[key];
+    },
+
+    set: function(value) {
+      ("production" !== "production" ? warning(
+        false,
+        'Don\'t set the ' + key + ' property of the component. ' +
+        'Mutate the existing props object instead.'
+      ) : null);
+      this._store[key] = value;
+    }
+
+  });
+}
+
+/**
+ * This is updated to true if the membrane is successfully created.
+ */
+var useMutationMembrane = false;
+
+/**
+ * Warn for mutations.
+ *
+ * @internal
+ * @param {object} element
+ */
+function defineMutationMembrane(prototype) {
+  try {
+    var pseudoFrozenProperties = {
+      props: true
+    };
+    for (var key in pseudoFrozenProperties) {
+      defineWarningProperty(prototype, key);
+    }
+    useMutationMembrane = true;
+  } catch (x) {
+    // IE will fail on defineProperty
+  }
+}
+
+/**
+ * Base constructor for all React elements. This is only used to make this
+ * work with a dynamic instanceof check. Nothing should live on this prototype.
+ *
+ * @param {*} type
+ * @param {string|object} ref
+ * @param {*} key
+ * @param {*} props
+ * @internal
+ */
+var ReactElement = function(type, key, ref, owner, context, props) {
+  // Built-in properties that belong on the element
+  this.type = type;
+  this.key = key;
+  this.ref = ref;
+
+  // Record the component responsible for creating this element.
+  this._owner = owner;
+
+  // TODO: Deprecate withContext, and then the context becomes accessible
+  // through the owner.
+  this._context = context;
+
+  if ("production" !== "production") {
+    // The validation flag and props are currently mutative. We put them on
+    // an external backing store so that we can freeze the whole object.
+    // This can be replaced with a WeakMap once they are implemented in
+    // commonly used development environments.
+    this._store = { validated: false, props: props };
+
+    // We're not allowed to set props directly on the object so we early
+    // return and rely on the prototype membrane to forward to the backing
+    // store.
+    if (useMutationMembrane) {
+      Object.freeze(this);
+      return;
+    }
+  }
+
+  this.props = props;
+};
+
+// We intentionally don't expose the function on the constructor property.
+// ReactElement should be indistinguishable from a plain object.
+ReactElement.prototype = {
+  _isReactElement: true
+};
+
+if ("production" !== "production") {
+  defineMutationMembrane(ReactElement.prototype);
+}
+
+ReactElement.createElement = function(type, config, children) {
+  var propName;
+
+  // Reserved names are extracted
+  var props = {};
+
+  var key = null;
+  var ref = null;
+
+  if (config != null) {
+    ref = config.ref === undefined ? null : config.ref;
+    if ("production" !== "production") {
+      ("production" !== "production" ? warning(
+        config.key !== null,
+        'createElement(...): Encountered component with a `key` of null. In ' +
+        'a future version, this will be treated as equivalent to the string ' +
+        '\'null\'; instead, provide an explicit key or use undefined.'
+      ) : null);
+    }
+    // TODO: Change this back to `config.key === undefined`
+    key = config.key == null ? null : '' + config.key;
+    // Remaining properties are added to a new props object
+    for (propName in config) {
+      if (config.hasOwnProperty(propName) &&
+          !RESERVED_PROPS.hasOwnProperty(propName)) {
+        props[propName] = config[propName];
+      }
+    }
+  }
+
+  // Children can be more than one argument, and those are transferred onto
+  // the newly allocated props object.
+  var childrenLength = arguments.length - 2;
+  if (childrenLength === 1) {
+    props.children = children;
+  } else if (childrenLength > 1) {
+    var childArray = Array(childrenLength);
+    for (var i = 0; i < childrenLength; i++) {
+      childArray[i] = arguments[i + 2];
+    }
+    props.children = childArray;
+  }
+
+  // Resolve default props
+  if (type && type.defaultProps) {
+    var defaultProps = type.defaultProps;
+    for (propName in defaultProps) {
+      if (typeof props[propName] === 'undefined') {
+        props[propName] = defaultProps[propName];
+      }
+    }
+  }
+
+  return new ReactElement(
+    type,
+    key,
+    ref,
+    ReactCurrentOwner.current,
+    ReactContext.current,
+    props
+  );
+};
+
+ReactElement.createFactory = function(type) {
+  var factory = ReactElement.createElement.bind(null, type);
+  // Expose the type on the factory and the prototype so that it can be
+  // easily accessed on elements. E.g. <Foo />.type === Foo.type.
+  // This should not be named `constructor` since this may not be the function
+  // that created the element, and it may not even be a constructor.
+  factory.type = type;
+  return factory;
+};
+
+ReactElement.cloneAndReplaceProps = function(oldElement, newProps) {
+  var newElement = new ReactElement(
+    oldElement.type,
+    oldElement.key,
+    oldElement.ref,
+    oldElement._owner,
+    oldElement._context,
+    newProps
+  );
+
+  if ("production" !== "production") {
+    // If the key on the original is valid, then the clone is valid
+    newElement._store.validated = oldElement._store.validated;
+  }
+  return newElement;
+};
+
+/**
+ * @param {?object} object
+ * @return {boolean} True if `object` is a valid component.
+ * @final
+ */
+ReactElement.isValidElement = function(object) {
+  // ReactTestUtils is often used outside of beforeEach where as React is
+  // within it. This leads to two different instances of React on the same
+  // page. To identify a element from a different React instance we use
+  // a flag instead of an instanceof check.
+  var isElement = !!(object && object._isReactElement);
+  // if (isElement && !(object instanceof ReactElement)) {
+  // This is an indicator that you're using multiple versions of React at the
+  // same time. This will screw with ownership and stuff. Fix it, please.
+  // TODO: We could possibly warn here.
+  // }
+  return isElement;
+};
+
+module.exports = ReactElement;
+
+},{"./ReactContext":11,"./ReactCurrentOwner":12,"./warning":20}],14:[function(_dereq_,module,exports){
+/**
+ * Copyright 2013-2014, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
  *
  * @providesModule ReactPropTransferer
  */
 
 "use strict";
 
+var assign = _dereq_("./Object.assign");
 var emptyFunction = _dereq_("./emptyFunction");
 var invariant = _dereq_("./invariant");
 var joinClasses = _dereq_("./joinClasses");
-var merge = _dereq_("./merge");
+var warning = _dereq_("./warning");
+
+var didWarn = false;
 
 /**
  * Creates a transfer strategy that will merge prop values using the supplied
@@ -561,7 +950,7 @@ var transferStrategyMerge = createTransferStrategy(function(a, b) {
   // `merge` overrides the first object's (`props[key]` above) keys using the
   // second object's (`value`) keys. An object's style's existing `propA` would
   // get overridden. Flip the order here.
-  return merge(b, a);
+  return assign({}, b, a);
 });
 
 /**
@@ -578,14 +967,6 @@ var TransferStrategies = {
    * Transfer the `className` prop by merging them.
    */
   className: createTransferStrategy(joinClasses),
-  /**
-   * Never transfer the `key` prop.
-   */
-  key: emptyFunction,
-  /**
-   * Never transfer the `ref` prop.
-   */
-  ref: emptyFunction,
   /**
    * Transfer the `style` prop (which is an object) by merging them.
    */
@@ -635,7 +1016,7 @@ var ReactPropTransferer = {
    * @return {object} a new object containing both sets of props merged.
    */
   mergeProps: function(oldProps, newProps) {
-    return transferInto(merge(oldProps), newProps);
+    return transferInto(assign({}, oldProps), newProps);
   },
 
   /**
@@ -651,26 +1032,39 @@ var ReactPropTransferer = {
      *
      * This is usually used to pass down props to a returned root component.
      *
-     * @param {ReactDescriptor} descriptor Component receiving the properties.
-     * @return {ReactDescriptor} The supplied `component`.
+     * @param {ReactElement} element Component receiving the properties.
+     * @return {ReactElement} The supplied `component`.
      * @final
      * @protected
      */
-    transferPropsTo: function(descriptor) {
+    transferPropsTo: function(element) {
       ("production" !== "production" ? invariant(
-        descriptor._owner === this,
+        element._owner === this,
         '%s: You can\'t call transferPropsTo() on a component that you ' +
         'don\'t own, %s. This usually means you are calling ' +
         'transferPropsTo() on a component passed in as props or children.',
         this.constructor.displayName,
-        descriptor.type.displayName
-      ) : invariant(descriptor._owner === this));
+        typeof element.type === 'string' ?
+        element.type :
+        element.type.displayName
+      ) : invariant(element._owner === this));
 
-      // Because descriptors are immutable we have to merge into the existing
+      if ("production" !== "production") {
+        if (!didWarn) {
+          didWarn = true;
+          ("production" !== "production" ? warning(
+            false,
+            'transferPropsTo is deprecated. ' +
+            'See http://fb.me/react-transferpropsto for more information.'
+          ) : null);
+        }
+      }
+
+      // Because elements are immutable we have to merge into the existing
       // props object rather than clone it.
-      transferInto(descriptor.props, this.props);
+      transferInto(element.props, this.props);
 
-      return descriptor;
+      return element;
     }
 
   }
@@ -678,21 +1072,14 @@ var ReactPropTransferer = {
 
 module.exports = ReactPropTransferer;
 
-},{"./emptyFunction":13,"./invariant":14,"./joinClasses":15,"./merge":18}],11:[function(_dereq_,module,exports){
+},{"./Object.assign":10,"./emptyFunction":16,"./invariant":17,"./joinClasses":18,"./warning":20}],15:[function(_dereq_,module,exports){
 /**
- * Copyright 2013-2014 Facebook, Inc.
+ * Copyright 2013-2014, Facebook, Inc.
+ * All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
  *
  * @typechecks
  * @providesModule cloneWithProps
@@ -700,6 +1087,7 @@ module.exports = ReactPropTransferer;
 
 "use strict";
 
+var ReactElement = _dereq_("./ReactElement");
 var ReactPropTransferer = _dereq_("./ReactPropTransferer");
 
 var keyOf = _dereq_("./keyOf");
@@ -719,7 +1107,7 @@ var CHILDREN_PROP = keyOf({children: null});
 function cloneWithProps(child, props) {
   if ("production" !== "production") {
     ("production" !== "production" ? warning(
-      !child.props.ref,
+      !child.ref,
       'You are calling cloneWithProps() on a child with a ref. This is ' +
       'dangerous because you\'re creating a new child which will not be ' +
       'added as a ref to its parent.'
@@ -735,88 +1123,23 @@ function cloneWithProps(child, props) {
   }
 
   // The current API doesn't retain _owner and _context, which is why this
-  // doesn't use ReactDescriptor.cloneAndReplaceProps.
-  return child.constructor(newProps);
+  // doesn't use ReactElement.cloneAndReplaceProps.
+  return ReactElement.createElement(child.type, newProps);
 }
 
 module.exports = cloneWithProps;
 
-},{"./ReactPropTransferer":10,"./keyOf":17,"./warning":21}],12:[function(_dereq_,module,exports){
+},{"./ReactElement":13,"./ReactPropTransferer":14,"./keyOf":19,"./warning":20}],16:[function(_dereq_,module,exports){
 /**
- * Copyright 2013-2014 Facebook, Inc.
+ * Copyright 2013-2014, Facebook, Inc.
+ * All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- * @providesModule copyProperties
- */
-
-/**
- * Copy properties from one or more objects (up to 5) into the first object.
- * This is a shallow copy. It mutates the first object and also returns it.
- *
- * NOTE: `arguments` has a very significant performance penalty, which is why
- * we don't support unlimited arguments.
- */
-function copyProperties(obj, a, b, c, d, e, f) {
-  obj = obj || {};
-
-  if ("production" !== "production") {
-    if (f) {
-      throw new Error('Too many arguments passed to copyProperties');
-    }
-  }
-
-  var args = [a, b, c, d, e];
-  var ii = 0, v;
-  while (args[ii]) {
-    v = args[ii++];
-    for (var k in v) {
-      obj[k] = v[k];
-    }
-
-    // IE ignores toString in object iteration.. See:
-    // webreflection.blogspot.com/2007/07/quick-fix-internet-explorer-and.html
-    if (v.hasOwnProperty && v.hasOwnProperty('toString') &&
-        (typeof v.toString != 'undefined') && (obj.toString !== v.toString)) {
-      obj.toString = v.toString;
-    }
-  }
-
-  return obj;
-}
-
-module.exports = copyProperties;
-
-},{}],13:[function(_dereq_,module,exports){
-/**
- * Copyright 2013-2014 Facebook, Inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
  *
  * @providesModule emptyFunction
  */
-
-var copyProperties = _dereq_("./copyProperties");
 
 function makeEmptyFunction(arg) {
   return function() {
@@ -831,32 +1154,23 @@ function makeEmptyFunction(arg) {
  */
 function emptyFunction() {}
 
-copyProperties(emptyFunction, {
-  thatReturns: makeEmptyFunction,
-  thatReturnsFalse: makeEmptyFunction(false),
-  thatReturnsTrue: makeEmptyFunction(true),
-  thatReturnsNull: makeEmptyFunction(null),
-  thatReturnsThis: function() { return this; },
-  thatReturnsArgument: function(arg) { return arg; }
-});
+emptyFunction.thatReturns = makeEmptyFunction;
+emptyFunction.thatReturnsFalse = makeEmptyFunction(false);
+emptyFunction.thatReturnsTrue = makeEmptyFunction(true);
+emptyFunction.thatReturnsNull = makeEmptyFunction(null);
+emptyFunction.thatReturnsThis = function() { return this; };
+emptyFunction.thatReturnsArgument = function(arg) { return arg; };
 
 module.exports = emptyFunction;
 
-},{"./copyProperties":12}],14:[function(_dereq_,module,exports){
+},{}],17:[function(_dereq_,module,exports){
 /**
- * Copyright 2013-2014 Facebook, Inc.
+ * Copyright 2013-2014, Facebook, Inc.
+ * All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
  *
  * @providesModule invariant
  */
@@ -904,21 +1218,14 @@ var invariant = function(condition, format, a, b, c, d, e, f) {
 
 module.exports = invariant;
 
-},{}],15:[function(_dereq_,module,exports){
+},{}],18:[function(_dereq_,module,exports){
 /**
- * Copyright 2013-2014 Facebook, Inc.
+ * Copyright 2013-2014, Facebook, Inc.
+ * All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
  *
  * @providesModule joinClasses
  * @typechecks static-only
@@ -942,7 +1249,9 @@ function joinClasses(className/*, ... */) {
   if (argLength > 1) {
     for (var ii = 1; ii < argLength; ii++) {
       nextClass = arguments[ii];
-      nextClass && (className += ' ' + nextClass);
+      if (nextClass) {
+        className = (className ? className + ' ' : '') + nextClass;
+      }
     }
   }
   return className;
@@ -950,81 +1259,14 @@ function joinClasses(className/*, ... */) {
 
 module.exports = joinClasses;
 
-},{}],16:[function(_dereq_,module,exports){
+},{}],19:[function(_dereq_,module,exports){
 /**
- * Copyright 2013-2014 Facebook, Inc.
+ * Copyright 2013-2014, Facebook, Inc.
+ * All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- * @providesModule keyMirror
- * @typechecks static-only
- */
-
-"use strict";
-
-var invariant = _dereq_("./invariant");
-
-/**
- * Constructs an enumeration with keys equal to their value.
- *
- * For example:
- *
- *   var COLORS = keyMirror({blue: null, red: null});
- *   var myColor = COLORS.blue;
- *   var isColorValid = !!COLORS[myColor];
- *
- * The last line could not be performed if the values of the generated enum were
- * not equal to their keys.
- *
- *   Input:  {key1: val1, key2: val2}
- *   Output: {key1: key1, key2: key2}
- *
- * @param {object} obj
- * @return {object}
- */
-var keyMirror = function(obj) {
-  var ret = {};
-  var key;
-  ("production" !== "production" ? invariant(
-    obj instanceof Object && !Array.isArray(obj),
-    'keyMirror(...): Argument must be an object.'
-  ) : invariant(obj instanceof Object && !Array.isArray(obj)));
-  for (key in obj) {
-    if (!obj.hasOwnProperty(key)) {
-      continue;
-    }
-    ret[key] = key;
-  }
-  return ret;
-};
-
-module.exports = keyMirror;
-
-},{"./invariant":14}],17:[function(_dereq_,module,exports){
-/**
- * Copyright 2013-2014 Facebook, Inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
  *
  * @providesModule keyOf
  */
@@ -1053,257 +1295,14 @@ var keyOf = function(oneKeyObj) {
 
 module.exports = keyOf;
 
-},{}],18:[function(_dereq_,module,exports){
+},{}],20:[function(_dereq_,module,exports){
 /**
- * Copyright 2013-2014 Facebook, Inc.
+ * Copyright 2014, Facebook, Inc.
+ * All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- * @providesModule merge
- */
-
-"use strict";
-
-var mergeInto = _dereq_("./mergeInto");
-
-/**
- * Shallow merges two structures into a return value, without mutating either.
- *
- * @param {?object} one Optional object with properties to merge from.
- * @param {?object} two Optional object with properties to merge from.
- * @return {object} The shallow extension of one by two.
- */
-var merge = function(one, two) {
-  var result = {};
-  mergeInto(result, one);
-  mergeInto(result, two);
-  return result;
-};
-
-module.exports = merge;
-
-},{"./mergeInto":20}],19:[function(_dereq_,module,exports){
-/**
- * Copyright 2013-2014 Facebook, Inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- * @providesModule mergeHelpers
- *
- * requiresPolyfills: Array.isArray
- */
-
-"use strict";
-
-var invariant = _dereq_("./invariant");
-var keyMirror = _dereq_("./keyMirror");
-
-/**
- * Maximum number of levels to traverse. Will catch circular structures.
- * @const
- */
-var MAX_MERGE_DEPTH = 36;
-
-/**
- * We won't worry about edge cases like new String('x') or new Boolean(true).
- * Functions are considered terminals, and arrays are not.
- * @param {*} o The item/object/value to test.
- * @return {boolean} true iff the argument is a terminal.
- */
-var isTerminal = function(o) {
-  return typeof o !== 'object' || o === null;
-};
-
-var mergeHelpers = {
-
-  MAX_MERGE_DEPTH: MAX_MERGE_DEPTH,
-
-  isTerminal: isTerminal,
-
-  /**
-   * Converts null/undefined values into empty object.
-   *
-   * @param {?Object=} arg Argument to be normalized (nullable optional)
-   * @return {!Object}
-   */
-  normalizeMergeArg: function(arg) {
-    return arg === undefined || arg === null ? {} : arg;
-  },
-
-  /**
-   * If merging Arrays, a merge strategy *must* be supplied. If not, it is
-   * likely the caller's fault. If this function is ever called with anything
-   * but `one` and `two` being `Array`s, it is the fault of the merge utilities.
-   *
-   * @param {*} one Array to merge into.
-   * @param {*} two Array to merge from.
-   */
-  checkMergeArrayArgs: function(one, two) {
-    ("production" !== "production" ? invariant(
-      Array.isArray(one) && Array.isArray(two),
-      'Tried to merge arrays, instead got %s and %s.',
-      one,
-      two
-    ) : invariant(Array.isArray(one) && Array.isArray(two)));
-  },
-
-  /**
-   * @param {*} one Object to merge into.
-   * @param {*} two Object to merge from.
-   */
-  checkMergeObjectArgs: function(one, two) {
-    mergeHelpers.checkMergeObjectArg(one);
-    mergeHelpers.checkMergeObjectArg(two);
-  },
-
-  /**
-   * @param {*} arg
-   */
-  checkMergeObjectArg: function(arg) {
-    ("production" !== "production" ? invariant(
-      !isTerminal(arg) && !Array.isArray(arg),
-      'Tried to merge an object, instead got %s.',
-      arg
-    ) : invariant(!isTerminal(arg) && !Array.isArray(arg)));
-  },
-
-  /**
-   * @param {*} arg
-   */
-  checkMergeIntoObjectArg: function(arg) {
-    ("production" !== "production" ? invariant(
-      (!isTerminal(arg) || typeof arg === 'function') && !Array.isArray(arg),
-      'Tried to merge into an object, instead got %s.',
-      arg
-    ) : invariant((!isTerminal(arg) || typeof arg === 'function') && !Array.isArray(arg)));
-  },
-
-  /**
-   * Checks that a merge was not given a circular object or an object that had
-   * too great of depth.
-   *
-   * @param {number} Level of recursion to validate against maximum.
-   */
-  checkMergeLevel: function(level) {
-    ("production" !== "production" ? invariant(
-      level < MAX_MERGE_DEPTH,
-      'Maximum deep merge depth exceeded. You may be attempting to merge ' +
-      'circular structures in an unsupported way.'
-    ) : invariant(level < MAX_MERGE_DEPTH));
-  },
-
-  /**
-   * Checks that the supplied merge strategy is valid.
-   *
-   * @param {string} Array merge strategy.
-   */
-  checkArrayStrategy: function(strategy) {
-    ("production" !== "production" ? invariant(
-      strategy === undefined || strategy in mergeHelpers.ArrayStrategies,
-      'You must provide an array strategy to deep merge functions to ' +
-      'instruct the deep merge how to resolve merging two arrays.'
-    ) : invariant(strategy === undefined || strategy in mergeHelpers.ArrayStrategies));
-  },
-
-  /**
-   * Set of possible behaviors of merge algorithms when encountering two Arrays
-   * that must be merged together.
-   * - `clobber`: The left `Array` is ignored.
-   * - `indexByIndex`: The result is achieved by recursively deep merging at
-   *   each index. (not yet supported.)
-   */
-  ArrayStrategies: keyMirror({
-    Clobber: true,
-    IndexByIndex: true
-  })
-
-};
-
-module.exports = mergeHelpers;
-
-},{"./invariant":14,"./keyMirror":16}],20:[function(_dereq_,module,exports){
-/**
- * Copyright 2013-2014 Facebook, Inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- * @providesModule mergeInto
- * @typechecks static-only
- */
-
-"use strict";
-
-var mergeHelpers = _dereq_("./mergeHelpers");
-
-var checkMergeObjectArg = mergeHelpers.checkMergeObjectArg;
-var checkMergeIntoObjectArg = mergeHelpers.checkMergeIntoObjectArg;
-
-/**
- * Shallow merges two structures by mutating the first parameter.
- *
- * @param {object|function} one Object to be merged into.
- * @param {?object} two Optional object with properties to merge from.
- */
-function mergeInto(one, two) {
-  checkMergeIntoObjectArg(one);
-  if (two != null) {
-    checkMergeObjectArg(two);
-    for (var key in two) {
-      if (!two.hasOwnProperty(key)) {
-        continue;
-      }
-      one[key] = two[key];
-    }
-  }
-}
-
-module.exports = mergeInto;
-
-},{"./mergeHelpers":19}],21:[function(_dereq_,module,exports){
-/**
- * Copyright 2014 Facebook, Inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
  *
  * @providesModule warning
  */
@@ -1322,7 +1321,7 @@ var emptyFunction = _dereq_("./emptyFunction");
 var warning = emptyFunction;
 
 if ("production" !== "production") {
-  warning = function(condition, format ) {var args=Array.prototype.slice.call(arguments,2);
+  warning = function(condition, format ) {for (var args=[],$__0=2,$__1=arguments.length;$__0<$__1;$__0++) args.push(arguments[$__0]);
     if (format === undefined) {
       throw new Error(
         '`warning(condition, format, ...args)` requires a warning ' +
@@ -1339,6 +1338,6 @@ if ("production" !== "production") {
 
 module.exports = warning;
 
-},{"./emptyFunction":13}]},{},[7])
+},{"./emptyFunction":16}]},{},[7])
 (7)
 });
