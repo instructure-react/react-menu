@@ -6,7 +6,7 @@
     "Jason Madsen"
   ],
   "description": "Accessible menu component for React.JS",
-  "main": "dist/react-menu.js",
+  "main": "dist/umd/react-menu.js",
   "keywords": [
     "react",
     "menu",
