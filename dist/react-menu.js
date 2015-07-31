@@ -106,7 +106,7 @@ var Menu = module.exports = React.createClass({
     var trigger;
     if(this.verifyTwoChildren()) {
       React.Children.forEach(this.props.children, function(child){
-        if (child.type === MenuTrigger.type) {
+        if (child === MenuTrigger) {
           trigger = cloneWithProps(child, {
             ref: 'trigger',
             onToggleActive: this.handleTriggerToggle
@@ -121,7 +121,7 @@ var Menu = module.exports = React.createClass({
     var options;
     if(this.verifyTwoChildren()) {
       React.Children.forEach(this.props.children, function(child){
-        if (child.type === MenuOptions.type) {
+        if (child === MenuOptions) {
           options = cloneWithProps(child, {
             ref: 'options',
             horizontalPlacement: this.state.horizontalPlacement,
