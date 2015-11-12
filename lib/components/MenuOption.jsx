@@ -32,12 +32,6 @@ var MenuOption = module.exports = React.createClass({
     this.props._internalSelect();
   },
 
-  handleKeyUp: function(e) {
-    if (e.key === ' ') {
-      this.onSelect();
-    }
-  },
-
   handleKeyDown: function(e) {
     if (e.key === 'Enter') {
       this.onSelect();
@@ -67,7 +61,6 @@ var MenuOption = module.exports = React.createClass({
     return (
       <div
         onClick={this.handleClick}
-        onKeyUp={this.handleKeyUp}
         onKeyDown={this.handleKeyDown}
         onMouseOver={this.handleHover}
         className={this.buildName()}
