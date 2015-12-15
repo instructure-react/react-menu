@@ -43,11 +43,7 @@ var Menu = module.exports = React.createClass({
   },
 
   closeMenu: function() {
-    this.setState({active: false}, this.focusTrigger);
-  },
-
-  focusTrigger: function() {
-    this.refs.trigger.getDOMNode().focus();
+    this.setState({active: false});
   },
 
   handleBlur: function(e) {
