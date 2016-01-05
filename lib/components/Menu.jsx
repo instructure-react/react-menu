@@ -1,8 +1,5 @@
-/** @jsx React.DOM */
-
 var React = require('react');
-
-var cloneWithProps = require('react/lib/cloneWithProps');
+var ReactDOM = require('react-dom');
 var MenuTrigger = require('./MenuTrigger');
 var MenuOptions = require('./MenuOptions');
 var MenuOption = require('./MenuOption');
@@ -47,7 +44,7 @@ var Menu = module.exports = React.createClass({
   },
 
   handleBlur: function(e) {
-    var domNode = this.getDOMNode();
+    var domNode = ReactDOM.findDOMNode(this);
     
     // give next element a tick to take focus
     setTimeout(function() {
@@ -69,8 +66,8 @@ var Menu = module.exports = React.createClass({
   },
 
   updatePositioning: function() {
-    var triggerRect = this.refs.trigger.getDOMNode().getBoundingClientRect();
-    var optionsRect = this.refs.options.getDOMNode().getBoundingClientRect();
+    var triggerRect = ReactDOM.findDOMNode(this.refs.trigger).getBoundingClientRect();
+    var optionsRect = ReactDOM.findDOMNode(this.refs.options).getBoundingClientRect();
     var positionState = {};
     // horizontal = left if it wont fit on left side
     if (triggerRect.left + optionsRect.width > window.innerWidth) {
@@ -102,9 +99,10 @@ var Menu = module.exports = React.createClass({
   renderTrigger: function() {
     var trigger;
     if(this.verifyTwoChildren()) {
-      React.Children.forEach(this.props.children, function(child){
-        if (child.type === MenuTrigger.type) {
-          trigger = cloneWithProps(child, {
+      React.Children.forEach(this.props.children, function(child, index) {
+        if (child.type === MenuTrigger) {
+          trigger = React.cloneElement(child, {
+            key: child.key || index,
             ref: 'trigger',
             onToggleActive: this.handleTriggerToggle
           });
@@ -117,9 +115,10 @@ var Menu = module.exports = React.createClass({
   renderMenuOptions: function() {
     var options;
     if(this.verifyTwoChildren()) {
-      React.Children.forEach(this.props.children, function(child){
-        if (child.type === MenuOptions.type) {
-          options = cloneWithProps(child, {
+      React.Children.forEach(this.props.children, function(child, index) {
+        if (child.type === MenuOptions) {
+          options = React.cloneElement(child, {
+            key: child.key || index,
             ref: 'options',
             horizontalPlacement: this.state.horizontalPlacement,
             verticalPlacement: this.state.verticalPlacement,
