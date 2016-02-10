@@ -1,7 +1,8 @@
 /** @jsx React.DOM */
-assert = require('assert');
-React = require('react/addons');
-TestUtils = React.addons.TestUtils;
+var assert = require('assert');
+var React = require('react');
+var ReactDOM = require('react-dom');
+TestUtils =  require('react-addons-test-utils');
 var Menu = require('../lib/components/Menu');
 var MenuTrigger = require('../lib/components/MenuTrigger');
 var MenuOptions = require('../lib/components/MenuOptions');
@@ -15,7 +16,7 @@ throws = assert.throws;
 var _menuNode;
 renderMenu = function(container) {
   container = container || document.body;
-  return React.renderComponent((
+  return ReactDOM.render((
     <Menu>
       <MenuTrigger>I am the trigger, goo goo goo joob</MenuTrigger>
       <MenuOptions>
@@ -30,6 +31,6 @@ renderMenu = function(container) {
 
 unmountMenu = function(container) {
   container = container || document.body;
-  React.unmountComponentAtNode(container);
+  ReactDOM.unmountComponentAtNode(container);
 };
 
