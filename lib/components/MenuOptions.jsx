@@ -95,7 +95,7 @@ var MenuOptions = module.exports = React.createClass({
         role="menu"
         tabIndex="-1"
         aria-expanded={this.context.active}
-        style={{visibility: this.context.active ? 'visible' : 'hidden'}}
+        style={{display: this.context.active ? 'block' : 'none'}}
         className={this.buildName()}
         onKeyDown={this.handleKeys}
       >
