@@ -13,9 +13,11 @@ equal = assert.equal;
 strictEqual = assert.strictEqual;
 throws = assert.throws;
 
-var _menuNode;
+var memorizedContainer;
 renderMenu = function(container) {
-  container = container || document.body;
+  container = container || document.createElement('div');
+  document.body.appendChild(container);
+  memorizedContainer = container;
   return ReactDOM.render((
     <Menu>
       <MenuTrigger>I am the trigger, goo goo goo joob</MenuTrigger>
@@ -30,7 +32,8 @@ renderMenu = function(container) {
 };
 
 unmountMenu = function(container) {
-  container = container || document.body;
+  container = container || memorizedContainer;
   ReactDOM.unmountComponentAtNode(container);
+  container.remove();
 };
 

@@ -1,4 +1,5 @@
 require('./helper');
+var findDOMNode = require('react-dom').findDOMNode;
 
 describe('Menu', function () {
   describe('a single menu', function() {
@@ -14,32 +15,32 @@ describe('Menu', function () {
     });
 
     it('should hide menu options by default', function () {
-      equal(menu.refs.options.getDOMNode().style.visibility, 'hidden');
-      equal(menu.refs.options.getDOMNode().getAttribute('aria-expanded'), 'false');
-      equal(menu.refs.options.getDOMNode().style.visibility, 'hidden');
+      equal(findDOMNode(menu.refs.options).style.visibility, 'hidden');
+      equal(findDOMNode(menu.refs.options).getAttribute('aria-expanded'), 'false');
+      equal(findDOMNode(menu.refs.options).style.visibility, 'hidden');
       ok(!menu.state.active);
     });
 
     it('should show menu options when trigger is clicked', function () {
-      TestUtils.Simulate.click(menu.refs.trigger.getDOMNode());
-      equal(menu.refs.options.getDOMNode().getAttribute('aria-expanded'), 'true');
-      equal(menu.refs.options.getDOMNode().style.visibility, 'visible');
+      TestUtils.Simulate.click(findDOMNode(menu.refs.trigger));
+      equal(findDOMNode(menu.refs.options).getAttribute('aria-expanded'), 'true');
+      equal(findDOMNode(menu.refs.options).style.visibility, 'visible');
       ok(menu.state.active);
     });
 
     it('should toggle menu options trigger on enter key', function () {
-      TestUtils.Simulate.keyDown(menu.refs.trigger.getDOMNode(), {key: 'Enter'});
+      TestUtils.Simulate.keyDown(findDOMNode(menu.refs.trigger), {key: 'Enter'});
       ok(menu.state.active);
     });
 
     it('should focus first option', function () {
-      TestUtils.Simulate.click(menu.refs.trigger.getDOMNode());
-      equal(menu.refs.options.getDOMNode().children[0], document.activeElement);
+      TestUtils.Simulate.click(findDOMNode(menu.refs.trigger));
+      equal(findDOMNode(menu.refs.options).children[0], document.activeElement);
     });
 
     it('should have roles and aria attributes', function () {
-      var trigger = menu.refs.trigger.getDOMNode();
-      var options = menu.refs.options.getDOMNode();
+      var trigger = findDOMNode(menu.refs.trigger);
+      var options = findDOMNode(menu.refs.options);
       equal(trigger.getAttribute('aria-owns'), options.getAttribute('id'));
       equal(trigger.getAttribute('role'), 'button');
       equal(trigger.getAttribute('aria-haspopup'), 'true');
@@ -50,19 +51,19 @@ describe('Menu', function () {
 
     // TODO: These tests aren't working for some reason
     // it('should change selectedIndex on keydown', function () {
-    //   TestUtils.Simulate.click(menu.refs.trigger.getDOMNode());
-    //   TestUtils.Simulate.keyDown(menu.refs.options.getDOMNode(), {key: 'ArrowDown'});
+    //   TestUtils.Simulate.click(findDOMNode(menu.refs.trigger));
+    //   TestUtils.Simulate.keyDown(findDOMNode(menu.refs.options), {key: 'ArrowDown'});
     //   equal(menu.state.selectedIndex, 1);
     // });
 
     // it('should select menu option on enter', function () {
-    //   TestUtils.Simulate.click(menu.refs.trigger.getDOMNode());
-    //   TestUtils.Simulate.keyDown(menu.refs.options.getDOMNode().children[1], {key: 'Enter'});
+    //   TestUtils.Simulate.click(findDOMNode(menu.refs.trigger));
+    //   TestUtils.Simulate.keyDown(findDOMNode(menu.refs.options).children[1], {key: 'Enter'});
     //   equal(menu.state.selectedIndex, 1);
     // });
 
     it('should make menu option disabled', function () {
-      equal(menu.refs.options.getDOMNode().children[3].getAttribute('aria-disabled'), 'true');
+      equal(findDOMNode(menu.refs.options).children[3].getAttribute('aria-disabled'), 'true');
     });
   });
 
@@ -74,9 +75,6 @@ describe('Menu', function () {
       containerA = document.createElement("div");
       containerB = document.createElement("div");
 
-      document.body.appendChild(containerA);
-      document.body.appendChild(containerB);
-
       menuA = renderMenu(containerA);
       menuB = renderMenu(containerB);
     });
@@ -87,10 +85,10 @@ describe('Menu', function () {
     });
 
     it('should close the active menu when clicking another menu', function (done) {
-      TestUtils.Simulate.click(menuA.refs.trigger.getDOMNode());
+      TestUtils.Simulate.click(findDOMNode(menuA.refs.trigger));
       ok(menuA.state.active);
 
-      TestUtils.Simulate.click(menuB.refs.trigger.getDOMNode());
+      TestUtils.Simulate.click(findDOMNode(menuB.refs.trigger));
       // Unfortunate implementation detail that `active` is not reset until the next execution cycle
       setTimeout(function() {
         ok(!menuA.state.active);
