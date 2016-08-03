@@ -2,7 +2,7 @@
   "name": "react-menu",
   "version": "0.0.7",
   "description": "Accessible menu component for React.JS",
-  "main": "./dist/lib/index",
+  "main": "dist/lib/index.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/instructure-react/react-menu.git"
@@ -12,37 +12,12 @@
   "directories": {
     "example": "examples"
   },
-  "scripts": {
-    "test": "scripts/test --browsers Chrome --single-run",
-    "start": "scripts/dev-examples"
-  },
   "authors": [
     "Jason Madsen"
   ],
   "license": "MIT",
-  "devDependencies": {
-    "browserify": "13.0.0",
-    "browserify-shim": "3.8.12",
-    "envify": "3.4.0",
-    "expect": "1.14.0",
-    "jsx-loader": "0.13.2",
-    "karma": "0.13.19",
-    "karma-browserify": "^5.0.1",
-    "karma-chrome-launcher": "0.2.2",
-    "karma-cli": "0.1.2",
-    "karma-firefox-launcher": "0.1.7",
-    "karma-mocha": "0.2.1",
-    "mocha": "2.4.5",
-    "react": "^0.14.7",
-    "react-addons-test-utils": "^0.14.7",
-    "react-dom": "^0.14.7",
-    "reactify": "^1.1.1",
-    "rf-release": "0.4.0",
-    "uglify-js": "2.6.1",
-    "webpack-dev-server": "1.14.1"
-  },
   "peerDependencies": {
-    "react": "^0.14.7"
+    "react": "^0.13.0"
   },
   "tags": [
     "react",
