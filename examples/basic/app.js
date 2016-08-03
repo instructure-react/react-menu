@@ -1,6 +1,7 @@
 /** @jsx React.DOM */
 
 var React = require('react');
+var ReactDOM = require('react-dom');
 var Menu = require('../../lib/index');
 var MenuTrigger = require('../../lib/components/MenuTrigger');
 var MenuOptions = require('../../lib/components/MenuOptions');
@@ -65,4 +66,4 @@ var App = React.createClass({
 });
 
 
-React.renderComponent(<App/>, document.getElementById('example'));
+ReactDOM.render(<App/>, document.getElementById('example'));
