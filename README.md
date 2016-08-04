@@ -9,7 +9,8 @@ See example at [http://instructure-react.github.io/react-menu/](http://instructu
 ```html
 /** @jsx React.DOM */
 
-var react = require('react');
+var React = require('react');
+var ReactDOM = require('react-dom');
 
 var Menu = require('react-menu');
 var MenuTrigger = Menu.MenuTrigger;
@@ -39,7 +40,7 @@ var App = React.createClass({
           </div>
 
           <MenuOption disabled={true} onDisabledSelect={this.otherHanlder}>
-            diabled option
+            disabled option
           </MenuOption>
 
         </MenuOptions>
@@ -48,7 +49,7 @@ var App = React.createClass({
   }
 });
 
-React.renderComponent(<App />, document.body);
+ReactDOM.render(<App />, document.body);
 
 ```
 
