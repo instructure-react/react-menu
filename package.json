@@ -27,11 +27,12 @@
     "expect": "1.14.0",
     "jsx-loader": "0.13.2",
     "karma": "0.13.19",
-    "karma-browserify": "^5.0.1",
     "karma-chrome-launcher": "0.2.2",
     "karma-cli": "0.1.2",
     "karma-firefox-launcher": "0.1.7",
     "karma-mocha": "0.2.1",
+    "karma-webpack": "1.8.0",
+    "lodash.assign": "^4.1.0",
     "mocha": "2.4.5",
     "react": "^0.14.7",
     "react-addons-test-utils": "^0.14.7",
@@ -39,8 +40,8 @@
     "reactify": "^1.1.1",
     "rf-release": "0.4.0",
     "uglify-js": "2.6.1",
-    "webpack-dev-server": "1.14.1",
-    "webpack": "1.13.1"
+    "webpack": "1.13.1",
+    "webpack-dev-server": "1.14.1"
   },
   "peerDependencies": {
     "react": "^0.14.7"

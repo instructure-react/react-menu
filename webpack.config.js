@@ -1,6 +1,5 @@
 var fs = require('fs');
 var path = require('path');
-var webpack = require('webpack');
 
 var EXAMPLES_DIR = path.resolve(__dirname, 'examples');
 
@@ -38,15 +37,4 @@ module.exports = {
       { test: /\.(js|jsx)$/, loader: 'jsx-loader?harmony' }
     ]
   },
-
-  resolve: {
-    alias: {
-      'react-router': '../../modules/index'
-    }
-  },
-
-  plugins: [
-    new webpack.optimize.CommonsChunkPlugin('shared.js')
-  ]
-
 };

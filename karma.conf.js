@@ -1,9 +1,11 @@
+var assign = require("lodash.assign");
+
 module.exports = function(config) {
   config.set({
 
     basePath: '',
 
-    frameworks: ['mocha', 'browserify'],
+    frameworks: ['mocha'],
 
     files: [
       'specs/main.js'
@@ -12,13 +14,16 @@ module.exports = function(config) {
     exclude: [],
 
     preprocessors: {
-      'specs/main.js': ['browserify']
+      'specs/main.js': ['webpack']
     },
 
-    browserify: {
-      transform: ['envify', 'reactify'],
-      watch: true,
-      debug: true
+    webpack: assign(require('./webpack.config.js'), {
+      debug: true,
+      devtool: 'eval'
+    }),
+
+    webpackMiddleware: {
+      noInfo: true
     },
 
     reporters: ['progress'],
