@@ -1,19 +1,19 @@
 var assert = require('assert');
 var React = require('react');
 var ReactDOM = require('react-dom');
-TestUtils =  require('react-addons-test-utils');
+window.TestUtils =  require('react-addons-test-utils');
 var Menu = require('../lib/components/Menu');
 var MenuTrigger = require('../lib/components/MenuTrigger');
 var MenuOptions = require('../lib/components/MenuOptions');
 var MenuOption = require('../lib/components/MenuOption');
 
-ok = assert.ok;
-equal = assert.equal;
-strictEqual = assert.strictEqual;
-throws = assert.throws;
+window.ok = assert.ok;
+window.equal = assert.equal;
+window.strictEqual = assert.strictEqual;
+window.throws = assert.throws;
 
 var memorizedContainer;
-renderMenu = function(container) {
+window.renderMenu = function(container) {
   container = container || document.createElement('div');
   document.body.appendChild(container);
   memorizedContainer = container;
@@ -30,7 +30,7 @@ renderMenu = function(container) {
   ), container);
 };
 
-unmountMenu = function(container) {
+window.unmountMenu = function(container) {
   container = container || memorizedContainer;
   ReactDOM.unmountComponentAtNode(container);
   container.remove();

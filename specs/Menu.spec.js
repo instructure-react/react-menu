@@ -94,7 +94,7 @@ describe('Menu', function () {
         ok(!menuA.state.active);
         ok(menuB.state.active);
         done();
-      }, 1);
+      }, 100);
     });
   });
 
