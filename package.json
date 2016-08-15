@@ -1,6 +1,6 @@
 {
   "name": "react-menu",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "Accessible menu component for React.JS",
   "main": "./lib/index",
   "repository": {
