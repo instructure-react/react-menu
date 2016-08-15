@@ -7,8 +7,6 @@ See example at [http://instructure-react.github.io/react-menu/](http://instructu
 ## Basic Usage
 
 ```html
-/** @jsx React.DOM */
-
 var React = require('react');
 var ReactDOM = require('react-dom');
 

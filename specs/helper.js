@@ -1,4 +1,3 @@
-/** @jsx React.DOM */
 var assert = require('assert');
 var React = require('react');
 var ReactDOM = require('react-dom');

@@ -28,7 +28,6 @@
     "babel-preset-react": "6.11.1",
     "envify": "3.4.0",
     "expect": "1.14.0",
-    "jsx-loader": "0.13.2",
     "karma": "0.13.19",
     "karma-chrome-launcher": "0.2.2",
     "karma-cli": "0.1.2",
