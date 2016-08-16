@@ -20161,6 +20161,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+	function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
+
 	var React = __webpack_require__(2);
 	var buildClassName = __webpack_require__(161);
 
@@ -20172,7 +20176,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	    active: React.PropTypes.bool,
 	    onSelect: React.PropTypes.func,
 	    onDisabledSelect: React.PropTypes.func,
-	    disabled: React.PropTypes.bool
+	    disabled: React.PropTypes.bool,
+	    role: React.PropTypes.string
+	  },
+
+	  getDefaultProps: function getDefaultProps() {
+	    return {
+	      role: 'menuitem'
+	    };
 	  },
 
 	  mixins: [buildClassName],
@@ -20228,19 +20239,29 @@ return /******/ (function(modules) { // webpackBootstrap
 	  },
 
 	  render: function render() {
+	    var _props = this.props;
+	    var active = _props.active;
+	    var onSelect = _props.onSelect;
+	    var onDisabledSelect = _props.onDisabledSelect;
+	    var disabled = _props.disabled;
+	    var role = _props.role;
+	    var children = _props.children;
+
+	    var otherProps = _objectWithoutProperties(_props, ['active', 'onSelect', 'onDisabledSelect', 'disabled', 'role', 'children']);
+
 	    return React.createElement(
 	      'div',
-	      {
+	      _extends({}, otherProps, {
 	        onClick: this.handleClick,
 	        onKeyUp: this.handleKeyUp,
 	        onKeyDown: this.handleKeyDown,
 	        onMouseOver: this.handleHover,
 	        className: this.buildName(),
-	        role: 'menuitem',
+	        role: role,
 	        tabIndex: '-1',
-	        'aria-disabled': this.props.disabled
-	      },
-	      this.props.children
+	        'aria-disabled': disabled
+	      }),
+	      children
 	    );
 	  }
 
