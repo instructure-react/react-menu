@@ -1,0 +1,14 @@
+#!/bin/bash -e
+
+VERSION=$(node -p 'p=require("./package");p.version')
+
+git checkout -b common-js/v${VERSION}
+
+./scripts/build-commonjs
+node -p 'p=require("./build/package");p.main="build/lib/index.js";JSON.stringify(p,null,2)' > package.json
+
+git add build package.json
+git commit -m "Updates to v${VERSION}"
+git push -u origin common-js/v${VERSION}
+
+git checkout -
